@@ -100,6 +100,12 @@
           }),
           methods: {
             addBossData(){
+                if (Notification.permission === 'default' || Notification.permission === 'undefined') {
+                Notification.requestPermission(function(permission) {
+                    console.log('允許');
+                });
+                };
+
                 if(this.bossNo ==0){
                     alert('請選擇Boss名稱');
                     return;
