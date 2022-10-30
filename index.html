@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mvp計時器</title>
+    <!-- CSS only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <div id="app">
+    <div class="container">
+        <topImg>
+            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="">
+        </topImg>
+        <header>
+            <div>選擇Boss名稱:</div>
+            <select class="form-select" aria-label="Default select example" v-model="bossNo">
+                <option selected value="0" disabled>請選擇</option>
+                <option v-for="item in bossList" :value="item">{{item.id}}-{{item.name}}</option>
+              </select>
+              <div>紀錄時間模式:</div>
+              <select class="form-select" aria-label="Default select example">
+                <option value="1" selected>Boss雷達</option>
+                <option value="2" disabled>墓碑時間(開發中)</option>
+              </select>
+              <div>雷達預計重生時間:</div>
+              <div class="d-flex">
+                <div>小時:</div>
+                <select class="form-select-sm"  v-model="recordHour">
+                  <option value="0" selected>0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+                <div>分鐘:</div>
+              <select class="form-select-sm" aria-label="Default select example" v-model="recordMin">
+                <option value="0" selected>0</option>
+                <option v-for="index in 60" :key="index" :value="index">{{index}}</option>
+              </select>
+              </div>
+              <input class="form-control btn btn-primary m-1"  type="button" value="新增" @click="addBossData">
+        </header>
+        <context>
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">名稱</th>
+                    <th scope="col">下次刷新時間預計為</th>
+                    <th scope="col">下次預計重生預計為</th>
+                    <th scope="col">功能</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item) in bossListTable" :key="item.info.id">
+                    <th scope="row"><img :src="item.info.img" class="img-fluid" alt="">
+                    </th>
+                    <td>{{item.info.name}}</td>
+                    <td>{{item.info.recordHour}}小時 - {{item.info.recordMin}}分</td>
+                    <td v-if="item.timeOut" class="bg-danger bg-opacity-25">{{item.rebirthTime}}</td>
+                    <td v-else class="bg-success bg-opacity-25">{{item.rebirthTime}}</td>
+                    <td>
+                        <input class="btn btn-danger" type="button" value="移除" @click="removeBoss(item.info.id)" >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+        </context>
+    </div>
+</div>
+
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script>
+        const { createApp } = Vue
+        const mvp = [
+            {id:1734,name:'齊爾-D-01'},{id:1623,name:'RSX-0806'},{id:1086,name:'黃金蟲'},
+            {id:20421,name:'汙染蜘蛛女王'},{id:1272,name:'黑暗之王'},{id:2251,name:'喬伊亞'},
+    ]
+        createApp({
+          data() {
+            return {
+              rowid:0,
+              bossList:mvp,
+              bossNo:0,
+              recordHour:0,
+              recordMin:0,
+              bossListTable:[],
+              timerId:null
+            }
+          },
+          onMounted:(()=>{
+            console.log('mounted!')
+          }),
+          methods: {
+            addBossData(){
+                if(this.bossNo ==0){
+                    alert('請選擇Boss名稱');
+                    return;
+                }
+
+                let mvp = {
+                    id:'mvp'+ this.rowid,
+                    no:this.bossNo.id,
+                    name:this.bossNo.name,
+                    recordHour:this.recordHour,
+                    recordMin:this.recordMin,
+                    img:`https://static.divine-pride.net/images/mobs/png/${this.bossNo.id}.png`
+                }
+                this.rowid++
+                console.log(mvp);
+                this.handleRebirthTime(mvp);
+                this.setTimer();
+            },
+            handleRebirthTime(mvp){
+                let rebirthTime = moment().add(mvp.recordHour, 'hours').add(mvp.recordMin, 'minutes');
+                let data = {
+                    info:mvp,
+                    rebirthTime:rebirthTime.format("YYYY-MM-DD HH:mm"),
+                    timeOut:false
+                }
+                this.bossListTable.push(data)
+
+            },
+            setTimer(){
+                if(this.bossListTable.length > 0){
+                        this.timerId = setInterval(()=>{
+                        this.isTimeOut()
+                    },1000);
+                }
+
+            },
+            isTimeOut(){
+                let nowTime = moment().format("YYYY-MM-DD HH:mm")
+                this.bossListTable.forEach(function(item){
+                    let rebirthTime = item.rebirthTime
+                    if(moment(rebirthTime).isSameOrBefore(nowTime) && item.timeOut == false){
+                        var notifyConfig = {
+                        body: `${rebirthTime},重生!!`, // 設定內容
+                        icon: item.info.img, // 設定 icon
+                        };
+                        var notification = new Notification(item.info.name,notifyConfig)
+                        item.timeOut = true
+                    }
+                });
+                if(this.bossListTable.length == 0){
+                    clearInterval(this.timerId)
+                };
+            },
+            removeBoss(id){
+                let index = this.bossListTable.findIndex(item => item.info.id === id)
+                if(index !== -1){
+                    this.bossListTable.splice(index, 1);
+                }
+            },
+
+
+          },
+        }).mount('#app')
+      </script>
+</body>
+</html>
