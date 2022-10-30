@@ -150,6 +150,8 @@
                         var notifyConfig = {
                         body: `${rebirthTime},重生!!`, // 設定內容
                         icon: item.info.img, // 設定 icon
+                        tag:item.info.id,
+                        renotify: true
                         };
                         var notification = new Notification(item.info.name,notifyConfig)
                         item.timeOut = true
