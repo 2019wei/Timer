@@ -152,9 +152,14 @@
 
                         let notifyConfig = {
                         body: `${rebirthTime},重生!!`, // 設定內容
-                        data:`${rebirthTime},重生!!`,
                         icon: item.info.img, // 設定 icon
-                        tag:item.info.id
+                        link: '/#',
+                        tag:item.info.id,
+                        onClick: function () {
+                        window.focus();
+                        this.close();
+                    },
+        vibrate: [200, 100, 200, 100, 200, 100, 200]
                         };
 
                         Push.create(item.info.name,notifyConfig);
