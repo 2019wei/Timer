@@ -15,7 +15,7 @@
     <div id="app">
     <div class="container">
         <topImg>
-            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="">
+            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="img" title="v1.1">
         </topImg>
         <header>
             <div>選擇Boss名稱:</div>
@@ -77,6 +77,8 @@
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/push.js@1.0.12/bin/push.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/push.js@1.0.12/bin/serviceWorker.min.js"></script>
     <script>
         const { createApp } = Vue
         const mvp = [
@@ -147,14 +149,16 @@
                 this.bossListTable.forEach(function(item){
                     let rebirthTime = item.rebirthTime
                     if(moment(rebirthTime).isSameOrBefore(nowTime) && item.timeOut == false){
-                        var notifyConfig = {
+
+                        let notifyConfig = {
                         body: `${rebirthTime},重生!!`, // 設定內容
                         icon: item.info.img, // 設定 icon
-                        tag:item.info.id,
-                        renotify: true
+                        tag:item.info.id
                         };
-                        var notification = new Notification(item.info.name,notifyConfig)
-                        item.timeOut = true
+
+                        Push.create(item.info.name,notifyConfig);
+
+                        item.timeOut = true;
                     }
                 });
                 if(this.bossListTable.length == 0){
