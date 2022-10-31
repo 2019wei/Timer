@@ -15,7 +15,7 @@
     <div id="app">
     <div class="container">
         <topImg>
-            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="img" title="v1.1">
+            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="img" title="v1.2">
         </topImg>
         <header>
             <div>選擇Boss名稱:</div>
@@ -98,7 +98,10 @@
             }
           },
           mounted:(()=>{
-            Push.create('Boss計時器 - 通知已啟動');
+            let result = Push.Permission.has();
+            if(result){
+              Push.create('Boss計時器 - 通知已啟動');
+            }
           }),
           methods: {
             addBossData(){
