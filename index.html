@@ -15,7 +15,7 @@
     <div id="app">
     <div class="container">
         <topImg>
-            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="img" title="v1.3">
+            <img src="https://a.rimg.com.tw/s2/e/02/28/21647478313512_21.jpg" class="img-fluid" alt="img" title="v1.4">
         </topImg>
         <header>
             <div>選擇Boss名稱:</div>
@@ -157,16 +157,14 @@
                         let notifyConfig = {
                         body: `${rebirthTime},重生!!`, // 設定內容
                         icon: item.info.img, // 設定 icon
-                        link: '/#',
                         tag:item.info.id,
-                        onClick: function () {
-                        window.focus();
-                        this.close();
-                    },
-        vibrate: [200, 100, 200, 100, 200, 100, 200]
+                        vibrate: [200, 100, 200, 100, 200, 100, 200]
                         };
 
                         Push.create(item.info.name,notifyConfig);
+                        navigator.serviceWorker.ready.then(function(registration) {
+                          registration.showNotification(item.info.name,notifyConfig);
+                        });
 
                         item.timeOut = true;
                     }
