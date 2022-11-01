@@ -22,6 +22,7 @@
             <select class="form-select" aria-label="Default select example" v-model="bossNo">
                 <option selected value="0" disabled>請選擇</option>
                 <option v-for="item in bossList" :value="item">{{item.id}}-{{item.name}}</option>
+                <option value="0" disabled>新增 請洽  冰呆</option>
               </select>
               <div>紀錄時間模式:</div>
               <select class="form-select" aria-label="Default select example">
@@ -162,11 +163,6 @@
                         };
 
                         Push.create(item.info.name,notifyConfig);
-                        if('serviceWorker' in navigator){
-                        navigator.serviceWorker.ready.then(function(registration) {
-                          registration.showNotification(item.info.name,notifyConfig);
-                        })
-                        }
                         item.timeOut = true;
                     }
                 });
