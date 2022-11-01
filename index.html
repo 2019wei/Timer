@@ -162,10 +162,11 @@
                         };
 
                         Push.create(item.info.name,notifyConfig);
+                        if('serviceWorker' in navigator){
                         navigator.serviceWorker.ready.then(function(registration) {
                           registration.showNotification(item.info.name,notifyConfig);
-                        });
-
+                        })
+                        }
                         item.timeOut = true;
                     }
                 });
